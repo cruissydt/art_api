@@ -81,14 +81,14 @@ def search_page():
 
     # 使用 LLM 改寫
     rewrite_q = common.rewrite_query(query, groq_client)
-    logging.info(f"rewrite['intent']: {rewrite_q['intent']}")
+    logging.info(f"rewrite['valid']: {rewrite_q['valid']}")
     logging.info(f"rewrite['query']: {rewrite_q['query']}")
     logging.info(f"rewrite['reason']: {rewrite_q['reason']}")
 
-    if rewrite_q["intent"] == "invalid":
+    if rewrite_q["valid"] == False:
         return jsonify({
             "error": "無明確搜尋意圖",
-            "message": "請輸入想找的主題，例如：Python、投資、烘焙、心理學..."
+            "message": rewrite_q['reason']
         }), 400
 
     query_embedding = common.ST_MODEL.encode(
