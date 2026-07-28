@@ -215,7 +215,7 @@ def rewrite_query(query, groq_client):
         response = groq_client.chat.completions.create(
             model=GROQ_MODEL_NAME,
             temperature=0,
-            max_tokens=80,
+            max_tokens=1024,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": query},
