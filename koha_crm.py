@@ -97,6 +97,7 @@ def search_page():
         pc_title = pc_meta.get("題名", "")
         pc_author = ", ".join(pc_meta.get("所有名字", []))
         pc_isbn = ", ".join(pc_meta.get("國際標準書號", []))
+        pc_summary = ", ".join(pc_meta.get("AI摘要", []))
 
         results.append(
             {
@@ -105,6 +106,7 @@ def search_page():
                 "authors": pc_author,
                 "isbn": pc_isbn,
                 "score": round(pc_item.score, 4),
+                "summary": pc_summary,
                 "llm_msg": "暫無推薦原因",
             }
         )
