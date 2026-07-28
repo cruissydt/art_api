@@ -87,6 +87,7 @@ def search_page():
     logging.info(f"原始 Query：{query}")
     logging.info(f"Rewrite Query：{rewrite_query}")
 
+
     author_list = common.get_author_list("author_list.txt")
     author_find = common.get_author_find(author_list, query)
 

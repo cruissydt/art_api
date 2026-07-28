@@ -221,8 +221,12 @@ def rewrite_query(query, groq_client):
                 {"role": "user", "content": query},
             ],
         )
-
+        logging.info(response)
+        logging.info(response.choices[0])
+        logging.info(response.choices[0].message)
+    
         new_query = response.choices[0].message.content.strip()
+        logging.info(f"content={repr(new_query)}")
 
         new_query = re.sub(r"[\r\n]+", " ", new_query)
 
