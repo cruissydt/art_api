@@ -1,6 +1,7 @@
 import logging
 import common
 
+
 from flask import request, jsonify, make_response, Blueprint
 from pinecone import Pinecone
 from groq import Groq
@@ -78,10 +79,18 @@ def search_page():
     if len(query) > 50:
         return jsonify({"error": "請求內容太大"}), 400
 
+    # 使用 LLM 改寫
+    rewrite_query = common.rewrite_query(
+        query=query,
+        groq_client=groq_client,
+    )
+    logging.info(f"原始 Query：{query}")
+    logging.info(f"Rewrite Query：{rewrite_query}")
+
     author_list = common.get_author_list("author_list.txt")
     author_find = common.get_author_find(author_list, query)
 
-    query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
+    query_embedding = common.ST_MODEL.encode("query: " + rewrite_query).tolist()
 
     pc_response = pc.query(
         vector=query_embedding,
@@ -131,4 +140,10 @@ def search_page():
                 item["llm_msg"] = llm_msg[book_id]
 
     logging.info(f"搜尋成功完成 - 回傳 {len(results)} 筆結果")
-    return jsonify({"results": results, "query": query})
+    return jsonify(
+        {
+            "query": query,
+            "rewrite_query": rewrite_query,
+            "results": results,
+        }
+    )

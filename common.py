@@ -193,3 +193,40 @@ def get_llm_msg(arg_list, arg_groq):
             pass
 
         return {}
+
+
+def rewrite_query(query, groq_client):
+    system_prompt = """
+你是一位圖書館館藏檢索專家。
+
+你的工作不是回答問題，而是將使用者輸入改寫成適合向量搜尋(Vector Search)的查詢。
+
+規則：
+1. 保留搜尋意圖
+2. 去除贅字
+3. 補充合理的搜尋關鍵字
+4. 不回答問題
+5. 不解釋
+6. 回傳一句話
+7. 不超過40字
+"""
+
+    try:
+        response = groq_client.chat.completions.create(
+            model=GROQ_MODEL_NAME,
+            temperature=0,
+            max_tokens=80,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": query},
+            ],
+        )
+
+        new_query = response.choices[0].message.content.strip()
+
+        new_query = re.sub(r"[\r\n]+", " ", new_query)
+
+        return new_query
+
+    except Exception:
+        return query
