@@ -122,7 +122,7 @@ def search_page():
 
     if booklist:
         # llm_msg = common.get_llm_msg(booklist, groq_client)
-        llm_msg = None
+        llm_msg = {}
 
         for item in results:
             book_id = item["id"]
