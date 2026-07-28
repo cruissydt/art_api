@@ -80,12 +80,20 @@ def search_page():
         return jsonify({"error": "請求內容太大"}), 400
 
     # 使用 LLM 改寫
-    rewrite_query = common.rewrite_query(
-        query=query,
-        groq_client=groq_client,
-    )
-    logging.info(f"原始 Query：{query}")
-    logging.info(f"Rewrite Query：{rewrite_query}")
+    rewrite = common.rewrite_query(query, groq_client)
+    logging.info(f"rewrite['intent']: {rewrite['intent']}")
+    logging.info(f"rewrite['query']: {rewrite['query']}")
+    logging.info(f"rewrite['reason']: {rewrite['reason']}")
+
+    if rewrite["intent"] == "invalid":
+        return jsonify({
+            "error": "無明確搜尋意圖",
+            "message": "請輸入想找的主題，例如：Python、投資、烘焙、心理學..."
+        }), 400
+
+    query_embedding = common.ST_MODEL.encode(
+        "query: " + rewrite["query"]
+    ).tolist()
 
 
     author_list = common.get_author_list("author_list.txt")

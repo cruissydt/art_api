@@ -150,6 +150,9 @@ def get_llm_msg(arg_list, arg_groq):
     try:
         completion = arg_groq.chat.completions.create(
             model=GROQ_MODEL_NAME,
+            temperature=0.5,
+            max_tokens=1024,
+            response_format={"type": "json_object"},
             messages=[
                 {
                     "role": "system",
@@ -169,9 +172,6 @@ def get_llm_msg(arg_list, arg_groq):
                 },
                 {"role": "user", "content": prompt_text},
             ],
-            temperature=0.5,
-            max_tokens=1024,
-            response_format={"type": "json_object"},
         )
 
         response_content = completion.choices[0].message.content.strip()
@@ -197,18 +197,86 @@ def get_llm_msg(arg_list, arg_groq):
 
 def rewrite_query(query, groq_client):
     system_prompt = """
-你是一位圖書館館藏檢索專家。
+你是一位圖書館智慧檢索助手。
 
-你的工作不是回答問題，而是將使用者輸入改寫成適合向量搜尋(Vector Search)的查詢。
+你的工作是判斷使用者是否具有明確的找書意圖。
 
-規則：
-1. 保留搜尋意圖
-2. 去除贅字
-3. 補充合理的搜尋關鍵字
-4. 不回答問題
-5. 不解釋
-6. 回傳一句話
-7. 不超過40字
+請依下列規則輸出 JSON。
+
+{
+  "intent":"valid | vague | invalid",
+  "query":"改寫後搜尋字串",
+  "reason":"簡短原因"
+}
+
+判斷規則：
+
+valid
+---------
+使用者具有可搜尋的主題。
+
+例如：
+
+想學Python
+最近睡不好
+有沒有減肥食譜
+教做麵包
+
+請將 query 改寫成適合向量搜尋的關鍵字。
+
+--------------------
+
+vague
+---------
+使用者有找書意圖，
+但是主題太模糊。
+
+例如：
+
+不知道看什麼
+推薦一本書
+最近很無聊
+
+可以推論合理主題。
+
+例如
+
+query:
+推薦閱讀
+
+--------------------
+
+invalid
+---------
+沒有任何搜尋意圖。
+
+例如
+
+哈哈哈哈
+....
+???
+123456
+asdf
+^^
+
+此時
+
+query 必須為空字串。
+
+reason 簡短說明原因。
+
+不得回答問題。
+
+只能輸出 JSON。
+
+--------------------
+若輸入：
+- 超過 70% 為符號
+- 全為數字
+- 全為重複字元
+- 無任何自然語言
+
+一律 invalid
 """
 
     try:
@@ -216,6 +284,7 @@ def rewrite_query(query, groq_client):
             model=GROQ_MODEL_NAME,
             temperature=0,
             max_tokens=1024,
+            response_format={"type": "json_object"},
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": query},
@@ -224,13 +293,13 @@ def rewrite_query(query, groq_client):
         logging.info(response)
         logging.info(response.choices[0])
         logging.info(response.choices[0].message)
-    
-        new_query = response.choices[0].message.content.strip()
-        logging.info(f"content={repr(new_query)}")
 
-        new_query = re.sub(r"[\r\n]+", " ", new_query)
-
-        return new_query
+        # new_query = response.choices[0].message.content.strip()
+        # logging.info(f"content={repr(new_query)}")
+        # new_query = re.sub(r"[\r\n]+", " ", new_query)
+        # return new_query
+        return json.loads(response.choices[0].message.content)
+        
 
     except Exception:
         return query
