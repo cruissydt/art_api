@@ -170,6 +170,8 @@ def get_llm_msg(arg_list, arg_groq):
         prompt_text += f"<book_context>{temp}</book_context>\n"
         prompt_text += "---\n"
 
+    logging.info(prompt_text)
+
     try:
         llm_rsp = arg_groq.chat.completions.create(
             model=GROQ_MODEL_NAME,
