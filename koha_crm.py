@@ -67,8 +67,8 @@ def search_page():
     if len(query) > 50:
         return jsonify({"error": "請求內容太大"}), 400
 
-    author_list = common.get_author_list("author_list.txt")
-    author_find = common.get_author_find(author_list, query)
+    temp = common.get_author_list("crm_author_list.txt")
+    author_find = common.get_author_find(temp, query)
 
     query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
 

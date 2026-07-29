@@ -79,8 +79,8 @@ def search_page():
 
     query_embedding = common.ST_MODEL.encode("query: " + rewrite_q["query"]).tolist()
 
-    author_list = common.get_author_list("author_list.txt")
-    author_find = common.get_author_find(author_list, query)
+    temp = common.get_author_list("crm_2_author_list.txt")
+    author_find = common.get_author_find(temp, query)
 
     pc_response = pc.query(
         vector=query_embedding,
