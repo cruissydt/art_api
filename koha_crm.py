@@ -4,18 +4,9 @@ import common
 from flask import request, jsonify, make_response, Blueprint
 from pinecone import Pinecone
 from groq import Groq
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+
 
 koha_crm_bp = Blueprint("koha_crm", __name__)
-
-
-limiter = Limiter(
-    key_func=get_remote_address,
-    default_limits=[],
-    storage_uri=common.REDIS_CONNECTION_STRING,
-    strategy="fixed-window",
-)
 
 
 # =========================================================
@@ -50,8 +41,8 @@ def home():
 
 
 @koha_crm_bp.route("/api/search", methods=["POST"])
-@limiter.limit("5 per minute")
-@limiter.limit("100 per hour")
+@common.limiter.limit("5 per minute")
+@common.limiter.limit("100 per hour")
 def search_page():
     results = []
     booklist = []

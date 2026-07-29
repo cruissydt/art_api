@@ -8,9 +8,8 @@ from flask_cors import CORS
 from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import datetime
 
-from koha_crm import koha_crm_bp, limiter
-from koha_crm_2 import koha_crm_2_bp, limiter
-
+from koha_crm import koha_crm_bp
+from koha_crm_2 import koha_crm_2_bp
 
 # =========================================================
 # 日誌基礎設定 (建議放在 App 初始化之前)
@@ -44,7 +43,7 @@ for handler in logging.getLogger().handlers:
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
-limiter.init_app(app)
+common.limiter.init_app(app)
 
 
 # 註冊 Blueprint

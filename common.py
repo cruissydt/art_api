@@ -4,7 +4,8 @@ import re
 import json
 
 from sentence_transformers import SentenceTransformer
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 # =========================================================
 # 變數
 # =========================================================
@@ -34,6 +35,18 @@ FLASK_PORT = int(os.environ.get("FLASK_PORT", "8080"))
 
 
 ST_MODEL = SentenceTransformer(ST_MODEL_NAME, revision=ST_COMMIT_HASH)
+
+
+
+# =========================================================
+# 共同流限
+# =========================================================
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[],
+    storage_uri=REDIS_CONNECTION_STRING,
+    strategy="fixed-window",
+)
 
 # =========================================================
 # 函式
