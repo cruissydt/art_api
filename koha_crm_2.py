@@ -6,11 +6,7 @@ from flask import request, jsonify, make_response, Blueprint
 from pinecone import Pinecone
 from groq import Groq
 
-
 koha_crm_2_bp = Blueprint("koha_crm_2", __name__)
-
-
-
 
 
 # =========================================================
@@ -49,7 +45,6 @@ def home():
 @common.limiter.limit("100 per hour")
 def search_page():
     results = []
-    booklist = []
 
     logging.info(f"收到搜尋請求 - 來源 IP: {request.remote_addr}")
 
@@ -80,15 +75,9 @@ def search_page():
     logging.info(f"rewrite['reason']: {rewrite_q['reason']}")
 
     if rewrite_q["valid"] == False:
-        return jsonify({
-            "error": "無明確搜尋意圖",
-            "message": rewrite_q['reason']
-        }), 400
+        return jsonify({"error": "無明確搜尋意圖", "message": rewrite_q["reason"]}), 400
 
-    query_embedding = common.ST_MODEL.encode(
-        "query: " + rewrite_q["query"]
-    ).tolist()
-
+    query_embedding = common.ST_MODEL.encode("query: " + rewrite_q["query"]).tolist()
 
     author_list = common.get_author_list("author_list.txt")
     author_find = common.get_author_find(author_list, query)
@@ -112,26 +101,18 @@ def search_page():
         results.append(
             {
                 "id": pc_item.id,
+                "score": round(pc_item.score, 4),
+                "raw_text": pc_raw_text,
                 "title": pc_title,
                 "authors": pc_author,
                 "isbn": pc_isbn,
-                "score": round(pc_item.score, 4),
                 "summary": pc_summary,
                 "llm_msg": "暫無推薦原因",
             }
         )
 
-        temp = "\n".join(
-            [
-                f"題名：{pc_title}",
-                f"作者：{pc_author}",
-                f"書籍資料：{pc_raw_text}",
-            ]
-        )
-        booklist.append({"id": pc_item.id, "info": common.get_safe_text(temp)})
-
-    if booklist:
-        # llm_msg = common.get_llm_msg(booklist, groq_client)
+    if results:
+        # llm_msg = common.get_llm_msg(results, groq_client)
         llm_msg = {}
 
         for item in results:

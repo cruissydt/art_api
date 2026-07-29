@@ -5,7 +5,6 @@ from flask import request, jsonify, make_response, Blueprint
 from pinecone import Pinecone
 from groq import Groq
 
-
 koha_crm_bp = Blueprint("koha_crm", __name__)
 
 
@@ -45,7 +44,6 @@ def home():
 @common.limiter.limit("100 per hour")
 def search_page():
     results = []
-    booklist = []
 
     logging.info(f"收到搜尋請求 - 來源 IP: {request.remote_addr}")
 
@@ -93,27 +91,18 @@ def search_page():
         results.append(
             {
                 "id": pc_item.id,
+                "score": round(pc_item.score, 4),
+                "raw_text": pc_raw_text,
                 "title": pc_title,
                 "authors": pc_author,
                 "isbn": pc_isbn,
-                "score": round(pc_item.score, 4),
                 "summary": pc_summary,
                 "llm_msg": "暫無推薦原因",
             }
         )
 
-        temp = "\n".join(
-            [
-                f"題名：{pc_title}",
-                f"作者：{pc_author}",
-                f"書籍資料：{pc_raw_text}",
-            ]
-        )
-        booklist.append({"id": pc_item.id, "info": common.get_safe_text(temp)})
-
-    if booklist:
-        # print("正在呼叫 LLM 批次生成推薦原因...")
-        llm_msg = common.get_llm_msg(booklist, groq_client)
+    if results:
+        llm_msg = common.get_llm_msg(results, groq_client)
 
         for item in results:
             book_id = item["id"]

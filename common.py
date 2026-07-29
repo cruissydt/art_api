@@ -156,15 +156,22 @@ def get_llm_msg(arg_list, arg_groq):
     prompt_text = "以下是需要撰寫推薦原因的書籍資料：\n\n"
 
     for book in arg_list:
+        temp = ''
+        temp += "題名：" + book['title'] + '\n'
+        temp += "作者：" + book['authors'] + '\n'
+        temp += "書籍資料：" + book['raw_text'] + '\n'
+        temp = str(get_safe_text(temp))
+
+
         prompt_text += f"書籍ID: {book['id']}\n"
-        prompt_text += f"<book_context>{str(book['info'])}</book_context>\n"
+        prompt_text += f"<book_context>{temp}</book_context>\n"
         prompt_text += "---\n"
 
     try:
-        completion = arg_groq.chat.completions.create(
+        llm_rsp = arg_groq.chat.completions.create(
             model=GROQ_MODEL_NAME,
             temperature=0.5,
-            max_tokens=1024,
+            max_tokens=1800,
             response_format={"type": "json_object"},
             messages=[
                 {
@@ -187,8 +194,7 @@ def get_llm_msg(arg_list, arg_groq):
             ],
         )
 
-        response_content = completion.choices[0].message.content.strip()
-        return json.loads(response_content)
+        return json.loads(llm_rsp.choices[0].message.content.strip())
 
     except Exception as e:
         logging.error("Groq 呼叫失敗", exc_info=True)
@@ -263,21 +269,24 @@ query 改寫規則：
 """
 
     try:
-        response = groq_client.chat.completions.create(
+        llm_rsp = groq_client.chat.completions.create(
             model=GROQ_MODEL_NAME,
             temperature=0,
-            max_tokens=1024,
+            max_tokens=1800,
             response_format={"type": "json_object"},
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": query},
             ],
         )
-        logging.info(response)
-        logging.info(response.choices[0])
-        logging.info(response.choices[0].message)
+        '''
+        logging.info(llm_rsp)
+        logging.info(llm_rsp.choices[0])
+        logging.info(llm_rsp.choices[0].message)
+        '''
+        logging.info(llm_rsp.choices[0].message.content)
 
-        return json.loads(response.choices[0].message.content)
+        return json.loads(llm_rsp.choices[0].message.content)
         
 
     except Exception:

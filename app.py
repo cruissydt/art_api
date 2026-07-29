@@ -11,6 +11,7 @@ from datetime import datetime
 from koha_crm import koha_crm_bp
 from koha_crm_2 import koha_crm_2_bp
 
+
 # =========================================================
 # 日誌基礎設定 (建議放在 App 初始化之前)
 # =========================================================
