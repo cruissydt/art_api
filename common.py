@@ -138,8 +138,11 @@ def get_safe_text(arg_txt):
     arg_txt = re.sub(r"\b09\d{2}[-\s]?\d{3}[-\s]?\d{3}\b", "[PHONE_MASKED]", arg_txt)
 
     arg_txt = arg_txt.replace("<", "&lt;").replace(">", "&gt;")
+    arg_txt = arg_txt.replace("{","(").replace("}",")")
+    arg_txt = arg_txt.replace("```","")
+    arg_txt = arg_txt.replace('"', "'")
 
-    return arg_txt[:2000].strip()
+    return arg_txt[:6000].strip()
 
 
 def get_llm_msg(arg_list, arg_groq):
@@ -193,6 +196,12 @@ def get_llm_msg(arg_list, arg_groq):
                 {"role": "user", "content": prompt_text},
             ],
         )
+        '''
+        logging.info(llm_rsp)
+        logging.info(llm_rsp.choices[0])
+        logging.info(llm_rsp.choices[0].message)
+        '''
+        logging.info(llm_rsp.choices[0].message.content)
 
         return json.loads(llm_rsp.choices[0].message.content.strip())
 
@@ -286,7 +295,7 @@ query 改寫規則：
         '''
         logging.info(llm_rsp.choices[0].message.content)
 
-        return json.loads(llm_rsp.choices[0].message.content)
+        return json.loads(llm_rsp.choices[0].message.content.strip())
         
 
     except Exception:
