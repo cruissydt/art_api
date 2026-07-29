@@ -175,9 +175,21 @@ def get_llm_msg(arg_list, arg_groq):
     try:
         llm_rsp = arg_groq.chat.completions.create(
             model=GROQ_MODEL_NAME,
-            temperature=0.5,
+            temperature=0,
             max_tokens=1800,
-            response_format={"type": "json_object"},
+            # response_format={"type": "json_object"},
+            response_format={
+                "type":"json_schema",
+                "json_schema":{
+                    "name":"book_reasons",
+                    "schema":{
+                        "type":"object",
+                        "additionalProperties":{
+                            "type":"string"
+                        }
+                    }
+                }
+            },
             messages=[
                 {
                     "role": "system",
