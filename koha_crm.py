@@ -86,7 +86,7 @@ def search_page():
         pc_title = pc_meta.get("題名", "")
         pc_author = ", ".join(pc_meta.get("所有名字", []))
         pc_isbn = ", ".join(pc_meta.get("國際標準書號", []))
-        pc_summary = ", ".join(pc_meta.get("AI摘要", []))
+        pc_summary = ", ".join(pc_meta.get("RAG摘要", []))
 
         results.append(
             {
