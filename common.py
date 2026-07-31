@@ -28,8 +28,8 @@ ST_COMMIT_HASH = os.environ.get("ST_COMMIT_HASH")
 PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX_NAME")
 
-#GROQ_API_KEY = os.environ.get("GROQ_API_KEY_1")
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY_2")
+#GROQ_API_KEY = os.environ.get("GROQ_API_KEY_REDSULLEY")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY_CRUISSYDT")
 GROQ_MODEL_NAME = os.environ.get("GROQ_MODEL_NAME")
 
 FLASK_HOST = os.environ.get("FLASK_HOST", "0.0.0.0")
