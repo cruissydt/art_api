@@ -74,7 +74,7 @@ def search_page():
 
     pc_response = pc.query(
         vector=query_embedding,
-        top_k=6,
+        top_k=10,
         include_metadata=True,
         filter={"所有名字": {"$in": author_find}} if author_find else None,
     )
