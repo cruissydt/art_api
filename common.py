@@ -189,7 +189,7 @@ def get_llm_msg(arg_list, arg_groq):
             #     },
             # },
             response_format={
-                "type": "json_schema",
+                "type": "json_object",
                 "json_schema": {
                     "name": "book_reasons",
                     "schema": {
