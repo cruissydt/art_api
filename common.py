@@ -170,7 +170,7 @@ def get_llm_msg(arg_list, arg_groq):
         prompt_text += f"<book_context>{temp}</book_context>\n"
         prompt_text += "---\n"
 
-    logging.info(prompt_text)
+    # logging.info(prompt_text)
 
     try:
         llm_rsp = arg_groq.chat.completions.create(
@@ -304,5 +304,9 @@ query 改寫與格式規則：
         return json.loads(llm_rsp.choices[0].message.content.strip())
 
     except Exception:
-        return query
+        return {
+            "valid": True,
+            "query": query,
+            "reason": "LLM改寫失敗,使用原始查詢",
+        }
 
