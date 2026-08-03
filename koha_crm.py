@@ -45,7 +45,7 @@ def home():
 def search_page():
     results = []
 
-    logging.info(f"收到搜尋請求-來源 IP: {request.remote_addr}")
+    logging.info(f"收到搜尋請求 - 來源 IP: {request.remote_addr}")
 
     data = request.get_json(silent=True) or {}
 

@@ -6,6 +6,11 @@ from flask import request, jsonify, make_response, Blueprint
 from pinecone import Pinecone
 from groq import Groq
 
+# 是否過濾使用者指令並改寫指令
+is_rewrite = False
+# 是否新增推薦原因
+is_llm_msg = False
+
 koha_crm_2_bp = Blueprint("koha_crm_2", __name__)
 
 
@@ -68,22 +73,25 @@ def search_page():
     if len(query) > 50:
         return jsonify({"error": "請求內容太大"}), 400
 
-    # 使用 LLM 改寫
-    '''
-    不要使用 LLM 改寫，因為額度有限和使用者輸入被檔住，出現會很煩的"錯誤:非找書意圖指令"訊息
-    rewrite_q = common.rewrite_query(query, groq_client)
-    logging.info(f"rewrite['valid']: {rewrite_q['valid']}")
-    logging.info(f"rewrite['query']: {rewrite_q['query']}")
-    logging.info(f"rewrite['reason']: {rewrite_q['reason']}")
+    if is_rewrite:
+        # 不建議使用 LLM 改寫，因為額度有限和使用者輸入被檔住，出現會很煩的"錯誤:非找書意圖指令"訊息
+        rewrite_q = common.rewrite_query(query, groq_client)
+        logging.info(f"rewrite['valid']: {rewrite_q['valid']}")
+        logging.info(f"rewrite['query']: {rewrite_q['query']}")
+        logging.info(f"rewrite['reason']: {rewrite_q['reason']}")
 
-    if rewrite_q["valid"] == False:
-        return jsonify({"error": "無明確搜尋意圖", "message": rewrite_q["reason"]}), 400
-    query_embedding = common.ST_MODEL.encode("query: " + rewrite_q["query"]).tolist()
-    '''
+        if rewrite_q["valid"] == False:
+            return (
+                jsonify({"error": "無明確搜尋意圖", "message": rewrite_q["reason"]}),
+                400,
+            )
+        query_embedding = common.ST_MODEL.encode(
+            "query: " + rewrite_q["query"]
+        ).tolist()
+    else:
+        query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
 
-    query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
-
-    temp = common.get_author_list("crm_2_author_list.txt")
+    temp = common.get_author_list("crm_author_list.txt")
     author_find = common.get_author_find(temp, query)
 
     pc_response = pc.query(
@@ -115,21 +123,13 @@ def search_page():
             }
         )
 
-    if results:
-        # llm_msg = common.get_llm_msg(results, groq_client)
-        llm_msg = {}
+    if is_llm_msg:
+        llm_msg = common.get_llm_msg(results, groq_client)
 
         for item in results:
             book_id = item["id"]
-
             if book_id in llm_msg:
                 item["llm_msg"] = llm_msg[book_id]
 
-    logging.info(f"搜尋成功完成 - 回傳 {len(results)} 筆結果")
-    return jsonify(
-        {
-            "query": query,
-            #"rewrite_query": rewrite_q["query"],
-            "results": results,
-        }
-    )
+    #logging.info(f"搜尋成功完成 - 回傳 {len(results)} 筆結果")
+    return jsonify({"results": results, "query": query})
