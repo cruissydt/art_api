@@ -7,9 +7,9 @@ from pinecone import Pinecone
 from groq import Groq
 
 # 是否過濾使用者指令並改寫指令
-is_rewrite = False
+is_rewrite = 1
 # 是否新增推薦原因
-is_llm_msg = False
+is_llm_msg = 1
 
 koha_crm_2_bp = Blueprint("koha_crm_2", __name__)
 
