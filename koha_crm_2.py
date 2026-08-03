@@ -85,10 +85,12 @@ def search_page():
                 jsonify({"error": "無明確搜尋意圖", "message": rewrite_q["reason"]}),
                 400,
             )
+        ising_rewrite = rewrite_q['ising_rewrite']
         query_embedding = common.ST_MODEL.encode(
             "query: " + rewrite_q["query"]
         ).tolist()
     else:
+        ising_rewrite = 0
         query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
 
     temp = common.get_author_list("crm_author_list.txt")
@@ -131,5 +133,12 @@ def search_page():
             if book_id in llm_msg:
                 item["llm_msg"] = llm_msg[book_id]
 
-    #logging.info(f"搜尋成功完成 - 回傳 {len(results)} 筆結果")
-    return jsonify({"results": results, "query": query})
+    # logging.info(f"搜尋成功完成 - 回傳 {len(results)} 筆結果")
+    return jsonify(
+        {
+            "results": results,
+            "query": query,
+            "ising_rewrite": ising_rewrite,
+            "ising_llm_msg": llm_msg["ising_llm_msg"],
+        }
+    )
