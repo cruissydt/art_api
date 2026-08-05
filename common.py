@@ -226,6 +226,7 @@ query 改寫與格式規則：
         return result
 
     except Exception:
+        logging.exception("rewrite_query 呼叫失敗")
         return {
             "valid": True,
             "query": query,
@@ -236,7 +237,7 @@ query 改寫與格式規則：
 
 def get_llm_msg(arg_list, arg_groq):
     if not arg_list:
-        return {}
+        return {"ising_llm_msg": 0}
 
     prompt_text = "以下是需要撰寫推薦原因的書籍資料：\n\n"
 
@@ -291,7 +292,7 @@ def get_llm_msg(arg_list, arg_groq):
         return result
 
     except Exception as e:
-        logging.error("Groq 呼叫失敗", exc_info=True)
+        logging.exception("Groq 呼叫失敗")
 
         # 把完整錯誤物件印出
         logging.error(f"錯誤型別: {type(e)}")

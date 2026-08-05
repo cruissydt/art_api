@@ -1,4 +1,3 @@
-
 import logging
 import zoneinfo
 import common
@@ -43,6 +42,9 @@ for handler in logging.getLogger().handlers:
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+
+# 限制請求內容大小（16KB 對搜尋 API 綽綽有餘），避免大型 payload 消耗記憶體/CPU
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
 
 common.limiter.init_app(app)
 
