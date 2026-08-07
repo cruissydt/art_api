@@ -110,18 +110,20 @@ def search_page():
 
         if rewrite_q["valid"] == False:
             return (
-                jsonify(
-                    {"error": "unclear_intent", "message": rewrite_q["reason"]}
-                ),
+                jsonify({"error": "unclear_intent", "message": rewrite_q["reason"]}),
                 400,
             )
-        ising_rewrite = rewrite_q['ising_rewrite']
+        ising_rewrite = rewrite_q["ising_rewrite"]
+        """
         query_embedding = common.ST_MODEL.encode(
             "query: " + rewrite_q["query"]
         ).tolist()
+        """
+        query_embedding = common.ST_MODEL.encode(rewrite_q["query"]).tolist()
     else:
         ising_rewrite = 0
-        query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
+        # query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
+        query_embedding = common.ST_MODEL.encode(query).tolist()
 
     temp = common.get_author_list("koha_crm_author_list.txt")
     author_find = common.get_author_find(temp, query)
