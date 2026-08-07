@@ -22,8 +22,8 @@ WHITELIST_ORIGINS = [
 
 REDIS_CONNECTION_STRING = os.environ.get("REDIS_CONNECTION_STRING")
 
-ST_MODEL_NAME = os.environ.get("ST_MODEL_NAME")
-ST_COMMIT_HASH = os.environ.get("ST_COMMIT_HASH")
+ST_MODEL_NAME = os.environ.get("ST_MODEL_NAME_qwen3-06b")
+ST_COMMIT_HASH = os.environ.get("ST_COMMIT_HASH_qwen3-06b")
 
 PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
 PINECONE_INDEX_NAME = os.environ.get("PINECONE_INDEX_NAME")
@@ -37,7 +37,6 @@ FLASK_PORT = int(os.environ.get("FLASK_PORT", "8080"))
 
 
 ST_MODEL = SentenceTransformer(ST_MODEL_NAME, revision=ST_COMMIT_HASH)
-
 
 # =========================================================
 # 共同流限
