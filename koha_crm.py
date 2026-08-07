@@ -7,9 +7,9 @@ from pinecone import Pinecone
 from groq import Groq
 
 # 是否過濾使用者指令並改寫指令
-is_rewrite = 1
+is_rewrite = 0
 # 是否新增推薦原因
-is_llm_msg = 1
+is_llm_msg = 0
 
 koha_crm_bp = Blueprint("koha_crm", __name__)
 
@@ -123,7 +123,7 @@ def search_page():
         ising_rewrite = 0
         query_embedding = common.ST_MODEL.encode("query: " + query).tolist()
 
-    temp = common.get_author_list("crm_author_list.txt")
+    temp = common.get_author_list("koha_crm_author_list.txt")
     author_find = common.get_author_find(temp, query)
 
     pc_response = pc.query(
