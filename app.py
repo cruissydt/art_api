@@ -8,7 +8,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import datetime
 
 from koha_crm import koha_crm_bp
-from rag_test import rag_test_bp
+# from rag_test import rag_test_bp
 
 
 # =========================================================
@@ -51,7 +51,7 @@ common.limiter.init_app(app)
 
 # 註冊 Blueprint
 app.register_blueprint(koha_crm_bp, url_prefix="/koha_crm")
-app.register_blueprint(rag_test_bp, url_prefix="/rag_test")
+# app.register_blueprint(rag_test_bp, url_prefix="/rag_test")
 
 CORS(app, origins=common.WHITELIST_ORIGINS)
 
